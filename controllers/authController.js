@@ -5,7 +5,8 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User');
 
 const register = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, role } = req.body; 
+  console.log(req.body);
   try {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -17,7 +18,8 @@ const register = async (req, res) => {
     const newUser = new User({
       name,
       email,
-      password: hashedPassword
+      password: hashedPassword,
+      role
     });
 
     await newUser.save();
@@ -28,6 +30,7 @@ const register = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -55,6 +58,9 @@ const login = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   try {
+    if (!req.user || req.user.role !== 'admin') {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
     const users = await User.find();
     res.json(users);
   } catch (error) {
@@ -66,6 +72,15 @@ const getAllUsers = async (req, res) => {
 const getUserById = async (req, res) => {
   try {
     const userId = req.params.id;
+    const requestingUserId = req.user ? req.user._id : null;
+
+    const isAdmin = req.user && req.user.role === 'admin';
+    const isOwner = req.user && req.user._id.toString() === userId;
+
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
+
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
@@ -80,6 +95,12 @@ const getUserById = async (req, res) => {
 const deleteUser = async (req, res) => {
   try {
     const userId = req.params.id;
+    const isAdmin = req.user && req.user.role === 'admin';
+
+    if (!isAdmin) {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
+
     const deletedUser = await User.findByIdAndDelete(userId);
     if (!deletedUser) {
       return res.status(404).json({ message: 'User not found' });

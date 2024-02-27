@@ -10,7 +10,6 @@ const authenticate = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.TOKEN_KEY);
     req.authorId = decoded.id;
-    console.log("Author ID is::::",req.authorId);
     next();
   } catch (error) {
     return res.status(403).json({ message: 'Invalid token' });
