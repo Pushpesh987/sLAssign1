@@ -1,4 +1,3 @@
-// Mock blogs data
 const blogs = [];
 let cnt =1
 const getAllBlogs = (req, res) => {

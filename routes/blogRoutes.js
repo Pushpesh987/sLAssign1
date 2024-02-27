@@ -5,7 +5,7 @@ const validationMiddleware = require('../middleware/validationMiddleware');
 
 const router = express.Router();
 
-router.use(authMiddleware.authenticate); // Router-level authentication middleware
+router.use(authMiddleware.authenticate);
 
 router.get('/', blogController.getAllBlogs);
 router.post('/',  blogController.createBlog);
