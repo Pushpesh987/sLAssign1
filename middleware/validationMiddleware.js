@@ -1,3 +1,5 @@
+//middleware/validationMiddleware.js
+
 const Joi = require('joi');
 
 const validateLogin = (req, res, next) => {
@@ -29,5 +31,4 @@ const validateRegister = (req, res, next) => {
 module.exports = {
   validateLogin,
   validateRegister,
- 
 };
